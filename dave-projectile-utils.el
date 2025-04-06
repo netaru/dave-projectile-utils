@@ -1,14 +1,31 @@
 ;;; dave-projectile-utils.el --- Run commands in projectile-project-root  -*- lexical-binding: t -*-
 
-;; Public domain.
-
 ;; Author:    David Jonsson <david.jonsson306@gmail.com>
 ;; URL:       N/A
 ;; Version:   0.0.1
+;; Package-Requires: ((emacs "26.1") (projectile "2.9.1"))
+
+;;; License:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
 
-;; My first test package
+;; Just a lazy convenience package for me.
+;; Projectile already supports running commands from the root directory I just wanted a list of predefined actions that could be taken.
+;; The required version of projectile is higher than it should be it's just the version that was installed when this package was made.
 
 ;;; Code:
 (defcustom dave-projectile-generic-commands
