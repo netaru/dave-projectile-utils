@@ -45,20 +45,53 @@
   :group 'dave-projectile
   :type 'alist)
 
-(defun dave-projectile--get-mvn-commands ()
+(defun dave-projectile--get-mvn-commands (&optional in)
   "Add maven commands if a `pom.xml' file exists in the `projectile-project-root' directory. Otherwise nil."
-  (if (file-exists-p (concat (projectile-project-root) "pom.xml")) dave-projectile-mvn-commands))
+  (let ((folder (or in
+                    (projectile-project-root))))
+    (if (file-exists-p (concat folder "pom.xml")) dave-projectile-mvn-commands)))
 
-(defun dave-projectile--get-docker-compose-commands ()
+(defun dave-projectile--get-docker-compose-commands (&optional in)
   "Add docker compose commands if a `docker-compose.ya?ml' file exists in the `projectile-project-root' directory. Otherwise nil."
-  (let ((folder (projectile-project-root)))
+  (let ((folder (or in
+                    (projectile-project-root))))
     (if (or (file-exists-p (concat folder "docker-compose.yml"))
             (file-exists-p (concat folder "docker-compose.yaml"))) dave-projectile-docker-compose-commands)))
 
 (defun dave-projectile--get-commands ()
   "Get all completions for the current projectile project."
-  (append dave-projectile-generic-commands
-          (dave-projectile--get-mvn-commands)
-          (dave-projectile--get-docker-compose-commands)))
+  (let ((folder (projectile-project-root)))
+    (append dave-projectile-generic-commands
+            (dave-projectile--get-mvn-commands folder)
+            (dave-projectile--get-docker-compose-commands folder))))
+
+;;;###autoload
+(defun dave-projectile-execute (&optional in)
+  "Execute a command from the `projectile-project-root' from a predefined list of available commands.
+
+If the command is of type `string' execute the command directly with the `compile' command.
+
+If the command is of type `function' execute the function as is. It's up to the function to decide
+what will happen.
+
+If the command is of type `cons' try to fetch the function from the cons otherwise print a message
+telling the user that nothing has happend.
+
+If the optional argument IN is set use that as the commands instead.
+"
+  (interactive)
+  (let* ((default-directory (projectile-project-root))
+         (targets (dave-projectile--get-commands))
+         (command (or in
+                      (cdr (assoc (completing-read "Target: " targets nil t) targets)))))
+    (pcase command
+      ((pred functionp) (funcall command))
+      ((pred consp) (let ((inner (car (cdr command))))
+                      (if (functionp inner)
+                          (funcall inner)
+                        (message "Unable to execute: '%s'" command))))
+      ((pred stringp) (compile command))
+      (value (message "Unable to execute: '%s'" command)))))
+
 (provide 'dave-projectile-utils)
 ;;; dave-projectile-utils.el ends here
