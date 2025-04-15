@@ -2,8 +2,8 @@
 
 ;; Author:    David Jonsson <david.jonsson306@gmail.com>
 ;; URL:       N/A
-;; Version:   0.0.1
-;; Package-Requires: ((emacs "26.1") (projectile "2.9.1"))
+;; Version:   0.0.2
+;; Package-Requires: ((emacs "26.1") (projectile "2.9.1") (consult "0.32"))
 
 ;;; License:
 
@@ -109,6 +109,18 @@ If the optional argument IN is set use that as the commands instead.
                         (message "Unable to execute: '%s'" command))))
       ((pred stringp) (compilation-start command t (lambda (&rest _) (generate-new-buffer-name (format "*%s*" command)))))
       (value (message "Unable to execute: '%s'" command)))))
+
+;;;###autoload
+(defun dave-projectile-rg-todo ()
+  "Use `consult-ripgrep' to search project for FIXME and TODO."
+  (interactive)
+  (consult-ripgrep (projectile-project-root) "\\(FIXME\\|TODO\\)"))
+
+;;;###autoload
+(defun dave-projectile-find-notes ()
+  "Function to quickly open `projectile-project-root'/notes.org"
+  (interactive)
+  (find-file (concat (projectile-project-root) "notes.org")))
 
 (provide 'dave-projectile-utils)
 ;;; dave-projectile-utils.el ends here
