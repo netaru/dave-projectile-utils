@@ -2,7 +2,7 @@
 
 ;; Author:    David Jonsson <david.jonsson306@gmail.com>
 ;; URL:       N/A
-;; Version:   0.0.2
+;; Version:   0.0.3
 ;; Package-Requires: ((emacs "26.1") (projectile "2.9.1") (consult "0.32"))
 
 ;;; License:
@@ -28,6 +28,11 @@
 ;; The required version of projectile is higher than it should be it's just the version that was installed when this package was made.
 
 ;;; Code:
+(defcustom dave-projectile-work-source-directory (concat(getenv "HOME") "/workspace/git")
+  "Directory of work projects."
+  :group 'dave-projectile
+  :type 'directory)
+
 (defcustom dave-projectile-generic-commands
   '(("java version" . "java -version")
     ("environment" . "env"))
@@ -121,6 +126,12 @@ If the optional argument IN is set use that as the commands instead.
   "Function to quickly open `projectile-project-root'/notes.org"
   (interactive)
   (find-file (concat (projectile-project-root) "notes.org")))
+
+;;;###autoload
+(defun dave-projectile-rg-projects (&optional input)
+  "Function to quickly open `projectile-project-root'/notes.org"
+  (interactive)
+  (consult-ripgrep dave-projectile-work-source-directory input))
 
 (provide 'dave-projectile-utils)
 ;;; dave-projectile-utils.el ends here
