@@ -107,7 +107,7 @@ If the optional argument IN is set use that as the commands instead.
                       (if (functionp inner)
                           (funcall inner)
                         (message "Unable to execute: '%s'" command))))
-      ((pred stringp) (compile command))
+      ((pred stringp) (compilation-start command t (lambda (&rest _) (generate-new-buffer-name (format "*%s*" command)))))
       (value (message "Unable to execute: '%s'" command)))))
 
 (provide 'dave-projectile-utils)
