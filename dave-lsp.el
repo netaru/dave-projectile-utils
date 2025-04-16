@@ -1,4 +1,4 @@
-;;; lsp-dave.el --- Various lsp enhancements for me  -*- lexical-binding: t -*-
+;;; dave-lsp.el --- Various lsp enhancements for me  -*- lexical-binding: t -*-
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,5 +26,5 @@
   (interactive)
   (message "This is now in the scope"))
 
-(provide 'lsp-dave)
-;;; lsp-dave.el ends here
+(provide 'dave-lsp)
+;;; dave-lsp.el ends here
