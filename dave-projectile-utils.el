@@ -2,7 +2,7 @@
 
 ;; Author:    David Jonsson <david.jonsson306@gmail.com>
 ;; URL:       N/A
-;; Version:   0.0.3
+;; Version:   0.0.4
 ;; Package-Requires: ((emacs "26.1") (projectile "2.9.1") (consult "0.32"))
 
 ;;; License:
@@ -103,6 +103,12 @@ If the optional argument IN is set use that as the commands instead.
   (interactive)
   (let* ((default-directory (projectile-project-root))
          (targets (dave-projectile--get-commands))
+         (maxlen (+ 2 (apply #'max (seq-map (lambda (key) (length (car key))) targets))))
+         (completion-extra-properties
+          `(:annotation-function
+            ,(lambda (key)
+               (let ((fmt (concat "%" (int-to-string (- maxlen (length key))) "s '%s'")))
+                 (format fmt "-" (cdr (assoc key targets)))))))
          (command (or in
                       (cdr (assoc (completing-read "Target: " targets nil t) targets)))))
     (pcase command
