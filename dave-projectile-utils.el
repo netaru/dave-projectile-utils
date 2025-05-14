@@ -70,21 +70,31 @@
   "Add maven commands if a `pom.xml' file exists in the `projectile-project-root' directory. Otherwise nil."
   (let ((folder (or in
                     (projectile-project-root))))
-    (if (file-exists-p (concat folder "pom.xml")) dave-projectile-mvn-commands)))
+    (when (file-exists-p (concat folder "pom.xml")) dave-projectile-mvn-commands)))
 
 (defun dave-projectile--get-docker-compose-commands (&optional in)
   "Add docker compose commands if a `docker-compose.ya?ml' file exists in the `projectile-project-root' directory. Otherwise nil."
   (let ((folder (or in
                     (projectile-project-root))))
-    (if (or (file-exists-p (concat folder "docker-compose.yml"))
+    (when (or (file-exists-p (concat folder "docker-compose.yml"))
             (file-exists-p (concat folder "docker-compose.yaml"))) dave-projectile-docker-compose-commands)))
+
+(defun dave-projectile--get-package-json-commands (&optional in)
+  "Add scripts commands if a `package.json' file exists in the `projectile-project-root' directory. Otherwise nil."
+  (let ((folder (or in
+                    (projectile-project-root))))
+    (when (file-exists-p (concat folder "package.json"))
+      (let* ((json (json-read-file "package.json"))
+             (scripts (alist-get 'scripts json)))
+        (seq-map (lambda (elm) `(,(concat "node " (symbol-name (car elm))) . ,(cdr elm))) scripts)))))
 
 (defun dave-projectile--get-commands (&optional folder)
   "Get all completions for the current projectile project."
   (let ((folder (or folder (projectile-project-root))))
     (append dave-projectile-generic-commands
             (dave-projectile--get-mvn-commands folder)
-            (dave-projectile--get-docker-compose-commands folder))))
+            (dave-projectile--get-docker-compose-commands folder)
+            (dave-projectile--get-package-json-commands folder))))
 
 ;;;###autoload
 (defun dave-projectile-execute (&optional folder in)
