@@ -79,15 +79,15 @@
     (if (or (file-exists-p (concat folder "docker-compose.yml"))
             (file-exists-p (concat folder "docker-compose.yaml"))) dave-projectile-docker-compose-commands)))
 
-(defun dave-projectile--get-commands ()
+(defun dave-projectile--get-commands (&optional folder)
   "Get all completions for the current projectile project."
-  (let ((folder (projectile-project-root)))
+  (let ((folder (or folder (projectile-project-root))))
     (append dave-projectile-generic-commands
             (dave-projectile--get-mvn-commands folder)
             (dave-projectile--get-docker-compose-commands folder))))
 
 ;;;###autoload
-(defun dave-projectile-execute (&optional in)
+(defun dave-projectile-execute (&optional folder in)
   "Execute a command from the `projectile-project-root' from a predefined list of available commands.
 
 If the command is of type `string' execute the command directly with the `compile' command.
@@ -101,8 +101,8 @@ telling the user that nothing has happend.
 If the optional argument IN is set use that as the commands instead.
 "
   (interactive)
-  (let* ((default-directory (projectile-project-root))
-         (targets (dave-projectile--get-commands))
+  (let* ((default-directory (or folder (projectile-project-root)))
+         (targets (dave-projectile--get-commands folder))
          (maxlen (+ 2 (apply #'max (seq-map (lambda (key) (length (car key))) targets))))
          (completion-extra-properties
           `(:annotation-function
