@@ -32,6 +32,11 @@
   :group 'dave-projectile
   :type 'directory)
 
+(defcustom dave-projectile-node-script-prefix "npm run"
+  "Prefix to use with node commands found in `package.json'"
+  :group 'dave-projectile
+  :type 'string)
+
 (defcustom dave-projectile-generic-commands
   '(("java version" . "java -version")
     ("environment" . "env"))
@@ -66,6 +71,15 @@
   :group 'dave-projectile
   :type 'alist)
 
+(defcustom dave-projectile-node-commands
+  (let* ((prefix dave-projectile-node-script-prefix)
+         (fn (lambda (k v) (cons (format "%s %s" prefix k) (format "%s %s" prefix v)))))
+    `(,(apply fn '("install" "install"))
+      ,(apply fn '("install legacy" "install --legacy-peer-deps"))))
+  "List of available node commands."
+  :group 'dave-projectile
+  :type 'alist)
+
 (defun dave-projectile--get-mvn-commands (&optional in)
   "Add maven commands if a `pom.xml' file exists in the `projectile-project-root' directory. Otherwise nil."
   (let ((folder (or in
@@ -84,17 +98,25 @@
   (let ((folder (or in
                     (projectile-project-root))))
     (when (file-exists-p (concat folder "package.json"))
-      (let* ((json (json-read-file "package.json"))
-             (scripts (alist-get 'scripts json)))
-        (seq-map (lambda (elm) `(,(concat "node " (symbol-name (car elm))) . ,(cdr elm))) scripts)))))
+      (append
+       dave-projectile-node-commands
+       (let* ((json (json-read-file "package.json"))
+              (scripts (alist-get 'scripts json)))
+         (seq-map
+          (lambda (elm)
+            (let* ((key (concat dave-projectile-node-script-prefix " " (symbol-name (car elm))))
+                   (value (propertize key 'display (cdr elm))))
+              `(,key . ,value)))
+          scripts))))))
 
 (defun dave-projectile--get-commands (&optional folder)
   "Get all completions for the current projectile project."
   (let ((folder (or folder (projectile-project-root))))
-    (append dave-projectile-generic-commands
-            (dave-projectile--get-mvn-commands folder)
-            (dave-projectile--get-docker-compose-commands folder)
-            (dave-projectile--get-package-json-commands folder))))
+    (append
+     dave-projectile-generic-commands
+     (dave-projectile--get-mvn-commands folder)
+     (dave-projectile--get-docker-compose-commands folder)
+     (dave-projectile--get-package-json-commands folder))))
 
 ;;;###autoload
 (defun dave-projectile-execute (&optional folder in)
