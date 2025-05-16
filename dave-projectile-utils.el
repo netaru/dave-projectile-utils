@@ -100,14 +100,12 @@
     (when (file-exists-p (concat folder "package.json"))
       (append
        dave-projectile-node-commands
-       (let* ((json (json-read-file "package.json"))
-              (scripts (alist-get 'scripts json)))
-         (seq-map
-          (lambda (elm)
-            (let* ((key (concat dave-projectile-node-script-prefix " " (symbol-name (car elm))))
-                   (value (propertize key 'display (cdr elm))))
-              `(,key . ,value)))
-          scripts))))))
+       (seq-map
+        (lambda (elm)
+          (let* ((key (concat dave-projectile-node-script-prefix " " (symbol-name (car elm))))
+                 (value (propertize key 'display (cdr elm))))
+            `(,key . ,value)))
+        (alist-get 'scripts (json-read-file "package.json")))))))
 
 (defun dave-projectile--get-commands (&optional folder)
   "Get all completions for the current projectile project."
